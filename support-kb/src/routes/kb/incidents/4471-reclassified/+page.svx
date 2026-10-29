@@ -1,0 +1,36 @@
+---
+layout: runbook
+title: '#4471 · two date problems'
+owner: Wojciech Jaworski
+status: reviewed
+reviewed: 2026-10-29
+signature: 'Wojciech Jaworski · MEGA S01E03 · #4471 review · 2026-10-29'
+---
+
+<script>
+  import RenderStamp from '#lib/kb/RenderStamp.svelte';
+</script>
+
+Ticket #4471 contains **412 unique reports**, but they do not all describe the same bug. The export has 427 rows because some report IDs appear more than once; counting each report ID once leaves 412 reports merged into #4471.
+
+## Problems found
+
+### Shared date parser reads month first — 379 reports
+
+The shared parser treats dates as month-first even for tenants whose locale writes the day first. These reports come from 11 tenants and span app, email, and booking-form channels. For example, an invite for 7 April can be interpreted as 4 July. This is the largest group and matches the parser failure described on the original incident page.
+
+The intake tag is not a reliable cause label: 23 reports in this group were tagged `hint`, but tenant locale and form configuration put them in the parser group.
+
+### Booking form shows a conflicting date hint — 33 reports
+
+Three day-first tenants use booking-v3, whose date field displays `MM/DD/YYYY`. People follow that month-first hint, while the tenant locale and booking system expect day-first input. The form then produces the wrong date even though the person entered what the form requested. These 33 reports are all from the form channel.
+
+The intake tag also misses this cause: 15 of these reports were tagged `parser`. Classify from the tenant and booking form, not the intake guess or browser locale alone.
+
+## Counting and evidence
+
+Counts use unique report IDs with `mergedInto: 4471` from the supplied export. The rendered cause rules in `src/lib/kb/causes.ts` use the tenant directory's locale and form to distinguish the shared parser from the booking-v3 hint. The five one-day-move desk notes remain attached to their cause groups; they do not create a third cause.
+
+These are two issues, not one: the first requires correcting date parsing, while the second requires correcting the form's displayed format or its input handling. Track them separately so fixes and future reports can be evaluated against the right behavior.
+
+<RenderStamp {signature} />
