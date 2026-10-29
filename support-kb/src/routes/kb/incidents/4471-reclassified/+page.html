@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <title>#4471 · two date problems · support kb</title>
+    <style>
+      :root { color-scheme: light dark; --bg:#fbfaf7; --fg:#1d1d1b; --muted:#6b6a66; --line:#e3e0d8; --accent:#2f6f5e; --mono:ui-monospace,"Cascadia Code",Menlo,monospace; }
+      @media (prefers-color-scheme: dark) { :root { --bg:#171716; --fg:#ecebe6; --muted:#9c9a93; --line:#34332f; --accent:#6fbfa6; } }
+      body { max-width:760px; margin:2rem auto; padding:0 16px 4rem; background:var(--bg); color:var(--fg); font:16px/1.6 system-ui,sans-serif; }
+      .crumb,.meta,.stamp { color:var(--muted); font:0.85rem var(--mono); }
+      .meta { display:flex; flex-wrap:wrap; gap:.5rem 1rem; }
+      .pill { border:1px solid var(--line); border-radius:99px; padding:0 .6rem; }
+      h1 { line-height:1.2; }
+      h2 { margin-top:2rem; }
+      h3 { margin-top:1.5rem; }
+      code { font:0.88em var(--mono); }
+      a { color:var(--accent); }
+      footer { margin-top:3rem; padding-top:1rem; border-top:1px solid var(--line); color:var(--muted); font-size:.8rem; }
+    </style>
+  </head>
+  <body>
+    <a class="crumb" href="/kb">support desk · kb</a>
+    <header>
+      <h1>#4471 · two date problems</h1>
+      <p class="meta"><span>owner <b>Wojciech Jaworski</b></span><span class="pill">reviewed</span><span>reviewed 2026-10-29</span></p>
+    </header>
+    <p>Ticket #4471 contains <strong>412 unique reports</strong>, but they do not all describe the same bug. The export has 427 rows because some report IDs appear more than once; counting each report ID once leaves 412 reports merged into #4471.</p>
+    <h2>Problems found</h2>
+    <h3>Shared date parser reads month first — 379 reports</h3>
+    <p>The shared parser treats dates as month-first even for tenants whose locale writes the day first. These reports come from 11 tenants and span app, email, and booking-form channels. For example, an invite for 7 April can be interpreted as 4 July. This is the largest group and matches the parser failure described on the original incident page.</p>
+    <p>The intake tag is not a reliable cause label: 23 reports in this group were tagged <code>hint</code>, but tenant locale and form configuration put them in the parser group.</p>
+    <h3>Booking form shows a conflicting date hint — 33 reports</h3>
+    <p>Three day-first tenants use booking-v3, whose date field displays <code>MM/DD/YYYY</code>. People follow that month-first hint, while the tenant locale and booking system expect day-first input. The form then produces the wrong date even though the person entered what the form requested. These 33 reports are all from the form channel.</p>
+    <p>The intake tag also misses this cause: 15 of these reports were tagged <code>parser</code>. Classify from the tenant and booking form, not the intake guess or browser locale alone.</p>
+    <h2>Counting and evidence</h2>
+    <p>Counts use unique report IDs with <code>mergedInto: 4471</code> from the supplied export. The rendered cause rules in <code>src/lib/kb/causes.ts</code> use the tenant directory's locale and form to distinguish the shared parser from the booking-v3 hint. The five one-day-move desk notes remain attached to their cause groups; they do not create a third cause.</p>
+    <p>These are two issues, not one: the first requires correcting date parsing, while the second requires correcting the form's displayed format or its input handling. Track them separately so fixes and future reports can be evaluated against the right behavior.</p>
+    <p class="stamp">desk ref <b>DR-4DXX-J2N1</b></p>
+    <footer>Pages are written by people. Tables and charts are built from data at render time.</footer>
+  </body>
+</html>
